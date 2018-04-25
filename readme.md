@@ -11,3 +11,8 @@ https://www.youtube.com/watch?v=bdnQrl0PDNA
     - SH1106 controller - should be able to use [this](https://github.com/ThingPulse/esp8266-oled-ssd1306) library
 - Existing Defi analogue boost/oil pressure sensors
     - 5v supply voltage
+
+## Layout examples:
+Examples shown are rendered at same resolution as the OLED display. See [example-gauges.html](example-gauges.html) for live examples rendered using `canvas` elements. 
+
+![](boost-example.png)
