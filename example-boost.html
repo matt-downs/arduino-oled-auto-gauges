@@ -53,6 +53,13 @@
             var absMin = Math.abs(boostMin);
             var range = absMin + boostMax;
 
+            if (boostPressure > 0) {
+                // Draw the pressure bar behind the graph
+                var barLength = (boostPressure / boostMax) * length;
+                ctx.fillRect(x, y, barLength, y + height);
+            }
+
+            // Draw the graph line
             for (var i = 0; i < boostPressureHistory.length; i++) {
                 // Scale the values so that the min is always 0
                 var valueY = parseInt(boostPressureHistory[i]) + absMin;
@@ -62,8 +69,15 @@
                 // Calculate the coordinants
                 var pointY = y + height - valueY;
                 var pointX = length - i;
+                
+                // Invert the line if it is over the bar
+                if (pointX < barLength) ctx.fillStyle = '#000';
+                else ctx.fillStyle = '#fff';
+
                 displayLib.setPixel(pointX, pointY);
             }
+
+            ctx.fillStyle = '#fff';
 
             // Draw 0 line
             // Convert the value to be a ratio of the graph's height
