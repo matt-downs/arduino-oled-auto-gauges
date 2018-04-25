@@ -12,12 +12,12 @@
     </style>
 </head>
 <body>
-    <h2>Boost</h2>
+    <h2>Oil Pressure</h2>
     <div>
-        <input type="range" min="-1000" max="2000" value="0" class="slider" id="boost-value">
+        <input type="range" min="0" max="1000" value="0" class="slider" id="oil-value">
     </div>
+    <canvas id="oil-gauge" width="128" height="64"></canvas>
 
-    <canvas id="boost-gauge" width="128" height="64"></canvas>
 
     <script>
         // Emulate the function methods defined in https://github.com/ThingPulse/esp8266-oled-ssd1306
@@ -36,13 +36,13 @@
             }
         }
 
-        var canvas = document.getElementById('boost-gauge');
+        var canvas = document.getElementById('oil-gauge');
         var ctx = canvas.getContext('2d');
         
         var boostPressure = 0;
         var boostPressureHistory = [];
-        var boostMin = -5;
-        var boostMax = 5;
+        var boostMin = 0;
+        var boostMax = 6;
         
         
         function drawGraph(x, y, length, height) {
@@ -66,9 +66,9 @@
                 displayLib.setPixel(pointX, pointY);
             }
 
-            // Draw 0 line
+            // Draw target line (6)
             // Convert the value to be a ratio of the graph's height
-            var valueY = (absMin/range) * height;
+            var valueY = (6/range) * height;
             var pointY = y + height - valueY;
             drawHorizontalDottedLine(x, pointY, 128);
         }
@@ -90,8 +90,8 @@
             // Draw max
             ctx.font = "14px arial, sans-serif";
             displayLib.setTextAlignment('TEXT_ALIGN_RIGHT');
-            displayLib.drawString(128, 11, 'MAX');
-            displayLib.drawString(128, 28, boostMax);
+            displayLib.drawString(128, 11, 'TRGT');
+            displayLib.drawString(128, 28, '~6');
         }
 
 
@@ -109,9 +109,8 @@
         
 
         function main() {
-            boostPressure = parseFloat(document.querySelector('#boost-value').value) / 100;
+            boostPressure = parseFloat(document.querySelector('#oil-value').value) / 100;
             if (boostPressure > boostMax) boostMax = boostPressure;
-            if (boostPressure < boostMin) boostMin = boostPressure;
             boostPressureHistory.unshift(parseInt(boostPressure));
             if (boostPressureHistory.length > 128) {
                 boostPressureHistory.pop();
@@ -120,10 +119,6 @@
         }
         setInterval(main, 50);
 
-    </script>
-
-
-    <h2>Oil Pressure</h2>
-   
+    </script>   
 </body>
 </html>

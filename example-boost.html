@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Gauges</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            background-color: grey;
+        }
+    </style>
+</head>
+<body>
+    <h2>Boost</h2>
+    <div>
+        <input type="range" min="-1000" max="2000" value="0" class="slider" id="boost-value">
+    </div>
+    <canvas id="boost-gauge" width="128" height="64"></canvas>
+
+    <script>
+        // Emulate the function methods defined in https://github.com/ThingPulse/esp8266-oled-ssd1306
+        var displayLib = {
+            setPixel: function(x, y) {
+                ctx.fillRect(x, y, 1, 1);
+            },
+            drawString: function(x, y, text) {
+                ctx.fillText(text, x, y);
+            },
+            setTextAlignment: function(alignment) {
+                if (alignment == 'TEXT_ALIGN_RIGHT')
+                    ctx.textAlign="end"; 
+                else
+                    ctx.textAlign="start"; 
+            }
+        }
+
+        var canvas = document.getElementById('boost-gauge');
+        var ctx = canvas.getContext('2d');
+        
+        var boostPressure = 0;
+        var boostPressureHistory = [];
+        var boostMin = -5;
+        var boostMax = 5;
+        
+        
+        function drawGraph(x, y, length, height) {
+            // Draw top line
+            drawHorizontalDottedLine(x, y, length);
+            // Draw bottom line
+            drawHorizontalDottedLine(x, y + height, length);
+
+            var absMin = Math.abs(boostMin);
+            var range = absMin + boostMax;
+
+            for (var i = 0; i < boostPressureHistory.length; i++) {
+                // Scale the values so that the min is always 0
+                var valueY = parseInt(boostPressureHistory[i]) + absMin;
+                // Convert the value to be a ratio of the graph's height
+                valueY = (valueY/range) * height;
+            
+                // Calculate the coordinants
+                var pointY = y + height - valueY;
+                var pointX = length - i;
+                displayLib.setPixel(pointX, pointY);
+            }
+
+            // Draw 0 line
+            // Convert the value to be a ratio of the graph's height
+            var valueY = (absMin/range) * height;
+            var pointY = y + height - valueY;
+            drawHorizontalDottedLine(x, pointY, 128);
+        }
+
+
+        function drawHorizontalDottedLine(x, y, length) {
+            for (var i = 0; i < length; i++) {
+                if (!(i % 4)) displayLib.setPixel(x + i, y);
+            }
+        }
+
+        
+        function drawPress() {
+            // Draw current pressure
+            ctx.font = "36px arial, sans-serif";
+            displayLib.setTextAlignment('TEXT_ALIGN_LEFT');
+            displayLib.drawString(0, 28, boostPressure);
+
+            // Draw max
+            ctx.font = "14px arial, sans-serif";
+            displayLib.setTextAlignment('TEXT_ALIGN_RIGHT');
+            displayLib.drawString(128, 11, 'MAX');
+            displayLib.drawString(128, 28, boostMax);
+        }
+
+
+        function drawGauge() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Fill with black
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#fff';
+
+            drawGraph(0, 32, 128, 31);
+            drawPress();
+        }
+        
+
+        function main() {
+            boostPressure = parseFloat(document.querySelector('#boost-value').value) / 100;
+            if (boostPressure > boostMax) boostMax = boostPressure;
+            if (boostPressure < boostMin) boostMin = boostPressure;
+            boostPressureHistory.unshift(parseInt(boostPressure));
+            if (boostPressureHistory.length > 128) {
+                boostPressureHistory.pop();
+            }
+            drawGauge();
+        }
+        setInterval(main, 50);
+
+    </script>   
+</body>
+</html>
