@@ -13,10 +13,12 @@ https://www.youtube.com/watch?v=bdnQrl0PDNA
     - 5v supply voltage
 
 ## Layout examples:
-Examples shown are rendered at same resolution as the OLED display.
+Examples shown are rendered at the same resolution as the OLED display using similar draw methods.
 
 ![](example-boost.png)
+
 [example-boost.html](example-boost.html)
 
 ![](example-oil.png)
-[example-boost.html](example-oil.html)
+
+[example-oil.html](example-oil.html)
