@@ -23,50 +23,35 @@ void setup(void) {
 }
 
 void loop(void) {
+  // Only read from the sensors every 50 ms
   currentMillis = millis();
   if (currentMillis - startMillis >= period) {
     readSensorData();
     startMillis = currentMillis;
   }
-    
+
   u8g2.firstPage();
   do {
 
     // Draw current pressure
     u8g2.setFont(u8g2_font_fub20_tf);
-    float pressure = (float)boostPressure / 100;
-    char cstr[16];
-    dtostrf(pressure, 1, 2, cstr);
+    char cstr[6];
+    dtostrf((float)boostPressure / 100, 1, 2, cstr);
     u8g2.drawStr(0, 21, cstr);
 
     // Draw max pressure
     u8g2.setFont(u8g2_font_fub11_tf);
-    pressure = (float)boostMax / 100;
-    dtostrf(pressure, 1, 2, cstr);
+    dtostrf((float)boostMax / 100, 1, 2, cstr);
     u8g2.drawStr(70, 12, cstr);
 
     drawGraph(0, 32, 128, 31);
     
-
   } while ( u8g2.nextPage() );
 }
 
 
 void readSensorData(void) {
-  // Fake data
-//  int change = random(-2,3);
-//  boostPressure += change;
-//  int min = -10;
-//  int max = 20;
-//  if (boostPressure > max) boostPressure = max;
-//  if (boostPressure < min) boostPressure = min;
-  // End fake data
-
-  float sensorVal = analogRead(A0) / 0.34;
-
-  sensorVal -= 1000;
-
-  boostPressure = sensorVal;
+  boostPressure = ((float)analogRead(A0) / 0.34) - 1000;
 
   // Update max and min
   if (boostPressure > boostMax) boostMax = boostPressure;
@@ -120,13 +105,11 @@ void drawGraph(int x, int y, int len, int height) {
 
   if (boostPressure > 0) {
       // Draw the pressure bar behind the graph
-      float barLength = ((float)boostPressure / boostMax) * len;
+      int barLength = ((float)boostPressure / boostMax) * len;
       u8g2.setDrawColor(2);
-      u8g2.drawBox(x, y - 5, (int)barLength, 5);
+      u8g2.drawBox(x, y - 5, barLength, 5);
       u8g2.setDrawColor(1);
   }
-
-  
 }
 
 
