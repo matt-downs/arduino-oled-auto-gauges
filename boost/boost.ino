@@ -31,13 +31,19 @@ void loop(void) {
     
   u8g2.firstPage();
   do {
-    u8g2.setFont(u8g2_font_fub20_tf);
 
+    // Draw current pressure
+    u8g2.setFont(u8g2_font_fub20_tf);
     float pressure = (float)boostPressure / 100;
     char cstr[16];
     dtostrf(pressure, 1, 2, cstr);
-//    itoa(boostPressure, cstr, 10);
     u8g2.drawStr(0, 21, cstr);
+
+    // Draw max pressure
+    u8g2.setFont(u8g2_font_fub11_tf);
+    pressure = (float)boostMax / 100;
+    dtostrf(pressure, 1, 2, cstr);
+    u8g2.drawStr(70, 12, cstr);
 
     drawGraph(0, 32, 128, 31);
     
