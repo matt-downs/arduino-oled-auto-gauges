@@ -116,7 +116,7 @@ void drawGraph(int x, int y, int len, int height) {
       // Draw the pressure bar behind the graph
       float barLength = ((float)boostPressure / boostMax) * len;
       u8g2.setDrawColor(2);
-      u8g2.drawBox(x, y, (int)barLength, height);
+      u8g2.drawBox(x, y - 5, (int)barLength, 5);
       u8g2.setDrawColor(1);
   }
 
