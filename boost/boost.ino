@@ -45,7 +45,7 @@ void loop(void) {
     u8g2.drawStr(70, 12, cstr);
 
     drawGraph(0, 32, 128, 31);
-    
+
   } while ( u8g2.nextPage() );
 }
 
@@ -82,7 +82,7 @@ void drawGraph(int x, int y, int len, int height) {
   // Draw the lines
   drawHorizontalDottedLine(x, y, len);
   drawHorizontalDottedLine(x, y + height, len);
-  
+
   //var absMin = Math.abs(boostMin);
   int absMin = abs(boostMin);
   int range = absMin + boostMax;
@@ -104,25 +104,25 @@ void drawGraph(int x, int y, int len, int height) {
   drawHorizontalDottedLine(x, pointY, len);
 
   if (boostPressure > 0) {
-      // Draw the pressure bar behind the graph
-      int barLength = ((float)boostPressure / boostMax) * len;
-      u8g2.setDrawColor(2);
-      u8g2.drawBox(x, y - 5, barLength, 5);
-      u8g2.setDrawColor(1);
+    // Draw the pressure bar behind the graph
+    int barLength = ((float)boostPressure / boostMax) * len;
+    u8g2.setDrawColor(2);
+    u8g2.drawBox(x, y - 5, barLength, 5);
+    u8g2.setDrawColor(1);
   }
 }
 
 
 // Maps a value to a y height
 int mapValueToYPos(int val, int range, int y, int height) {
-  float valueY = ((float)val/range) * height;
+  float valueY = ((float)val / range) * height;
   return y + height - (int)valueY;
 }
 
 
 void drawHorizontalDottedLine(int x, int y, int len) {
   for (int i = 0; i < len; i++) {
-      if (!(i % 4)) u8g2.drawPixel(x + i, y);
+    if (!(i % 4)) u8g2.drawPixel(x + i, y);
   }
 }
 
