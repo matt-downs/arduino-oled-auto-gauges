@@ -68,14 +68,18 @@ void loop(void) {
 
 
 void readSensorData(void) {
+    // analogRead range 0 -> 1023
+  // Sensor voltage range 0.5v -> 4.5v (analogRead 102 -> 921)
+  
   // Account for 0.5v at 0psi (analogRead of 102 == 0.5v)
   int sensorValue = analogRead(A0) - 102;
-  // 0.05828571429 == 816/14000; 816 == sensor range; 14000 == 140psi
-  float absolutePressure = sensorValue / 0.05828571429;
+  
+  // 0.1638 == 819/5000; 819 == sensor range; 5000 == 50psi
+  float absolutePressure = sensorValue / 0.1638;
+  
   // 14.7 psi == pressure at sea level
-  boostPressure = absolutePressure - 1470;
-
-  //  boostPressure = ((float)analogRead(A0) / 0.34) - 1000;
+  // 2.7 subtracted as boost was showing -2.7 with engine off (maybe the above calculations are slightly off?)
+  boostPressure = absolutePressure - 1200;
 
   // Update max and min
   if (boostPressure > boostMax) boostMax = boostPressure;
@@ -111,21 +115,27 @@ void drawGraph(int x, int y, int len, int height) {
   int absMin = abs(boostMin);
   int range = absMin + boostMax;
 
+  // Draw 0 line
+  int zeroYPos = mapValueToYPos(absMin, range, y, height);
+  drawHorizontalDottedLine(x, zeroYPos, len);
+
   // Draw the graph line
   for (int i = 0; i < 128; i++) {
     // Scale the values so that the min is always 0
     int valueY = getSensorHistory(i) + absMin;
 
     // Calculate the coordinants
-    int pointY = mapValueToYPos(valueY, range, y, height);
-    int pointX = len - i;
-
-    u8g2.drawPixel(pointX, pointY);
+    int yPos = mapValueToYPos(valueY, range, y, height);
+    int xPos = len - i;
+    if (yPos < zeroYPos) {
+      // Point is above zero line, fill in space under graph
+      u8g2.drawVLine(xPos, yPos, zeroYPos + 1 - yPos);
+    } else {
+      // Point is below zero line, draw graph line without filling in
+      u8g2.drawPixel(xPos, yPos);
+    }
   }
 
-  // Draw 0 line
-  int pointY = mapValueToYPos(absMin, range, y, height);
-  drawHorizontalDottedLine(x, pointY, len);
 }
 
 
