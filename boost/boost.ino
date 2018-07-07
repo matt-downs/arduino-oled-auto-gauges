@@ -54,14 +54,18 @@ void loop(void) {
 
 
 void readSensorData(void) {
+  // analogRead range 0 -> 1023
+  // Sensor voltage range 0.5v -> 4.5v (analogRead 102 -> 921)
+  
   // Account for 0.5v at 0psi (analogRead of 102 == 0.5v)
   int sensorValue = analogRead(A0) - 102;
-  // 0.1632 == 816/5000; 816 == sensor range; 5000 == 50psi
-  float absolutePressure = sensorValue / 0.1632;
+  
+  // 0.1638 == 819/5000; 819 == sensor range; 5000 == 50psi
+  float absolutePressure = sensorValue / 0.1638;
+  
   // 14.7 psi == pressure at sea level
-  boostPressure = absolutePressure - 1470;
-
-  //  boostPressure = ((float)analogRead(A0) / 0.34) - 1000;
+  // 2.7 subtracted as boost was showing -2.7 with engine off (maybe the above calculations are slightly off?)
+  boostPressure = absolutePressure - 1200;
 
   // Update max and min
   if (boostPressure > boostMax) boostMax = boostPressure;
