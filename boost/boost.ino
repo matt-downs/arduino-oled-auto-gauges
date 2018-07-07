@@ -63,9 +63,9 @@ void readSensorData(void) {
   // 0.1638 == 819/5000; 819 == sensor range; 5000 == 50psi
   float absolutePressure = sensorValue / 0.1638;
   
-  // 14.7 psi == pressure at sea level
-  // 2.7 subtracted as boost was showing -2.7 with engine off (maybe the above calculations are slightly off?)
-  boostPressure = absolutePressure - 1200;
+  // subtract 14.7 psi == pressure at sea level
+  // additional 2.57psi subtracted as boost was showing 2.57 with engine off (maybe the above calculations are slightly off?)
+  boostPressure = absolutePressure - 1727;
 
   // Update max and min
   if (boostPressure > boostMax) boostMax = boostPressure;

@@ -74,12 +74,14 @@ void readSensorData(void) {
   // Account for 0.5v at 0psi (analogRead of 102 == 0.5v)
   int sensorValue = analogRead(A0) - 102;
   
-  // 0.1638 == 819/5000; 819 == sensor range; 5000 == 50psi
-  float absolutePressure = sensorValue / 0.1638;
+  // 0.0585 == 819/14000; 819 == sensor range; 14000 == 140psi
+  float absolutePressure = sensorValue / 0.0585;
   
   // 14.7 psi == pressure at sea level
-  // 2.7 subtracted as boost was showing -2.7 with engine off (maybe the above calculations are slightly off?)
-  boostPressure = absolutePressure - 1200;
+  boostPressure = absolutePressure - 1470;
+
+  // Oil pressure should never be negative
+  if (boostPressure < 0) boostPressure = 0;
 
   // Update max and min
   if (boostPressure > boostMax) boostMax = boostPressure;
