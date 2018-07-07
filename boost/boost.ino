@@ -101,21 +101,27 @@ void drawGraph(int x, int y, int len, int height) {
   int absMin = abs(boostMin);
   int range = absMin + boostMax;
 
+  // Draw 0 line
+  int zeroYPos = mapValueToYPos(absMin, range, y, height);
+  drawHorizontalDottedLine(x, zeroYPos, len);
+
   // Draw the graph line
   for (int i = 0; i < 128; i++) {
     // Scale the values so that the min is always 0
     int valueY = getSensorHistory(i) + absMin;
 
     // Calculate the coordinants
-    int pointY = mapValueToYPos(valueY, range, y, height);
-    int pointX = len - i;
-
-    u8g2.drawPixel(pointX, pointY);
+    int yPos = mapValueToYPos(valueY, range, y, height);
+    int xPos = len - i;
+    if (yPos < zeroYPos) {
+      // Point is above zero line, fill in space under graph
+      u8g2.drawVLine(xPos, yPos, zeroYPos + 1 - yPos);
+    } else {
+      // Point is below zero line, draw graph line without filling in
+      u8g2.drawPixel(xPos, yPos);
+    }
   }
 
-  // Draw 0 line
-  int pointY = mapValueToYPos(absMin, range, y, height);
-  drawHorizontalDottedLine(x, pointY, len);
 }
 
 
