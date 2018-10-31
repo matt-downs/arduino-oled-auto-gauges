@@ -130,13 +130,13 @@ void drawGraph(int x, int y, int len, int height) {
   drawHorizontalDottedLine(x, y, len);
   drawHorizontalDottedLine(x, y + height, len);
   // Draw 0 line
-  int zeroYPos = scaleValue(0, boostMax, boostMax, y, y + height)
+  int zeroYPos = scaleValue(0, boostMin, boostMax, y, y + height)
   drawHorizontalDottedLine(x, zeroYPos, len);
 
   // Draw the graph line
   for (int i = 0; i < 128; i++) {
     // Calculate the coordinants
-    int yPos = scaleValue(getSensorHistory(i), boostMax, boostMax, y, y + height)
+    int yPos = scaleValue(getSensorHistory(i), boostMin, boostMax, y, y + height)
     int xPos = len - i;
     if (yPos < zeroYPos) {
       // Point is above zero line, fill in space under graph
