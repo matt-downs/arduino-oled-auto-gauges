@@ -67,17 +67,39 @@ void loop(void) {
 }
 
 
+float normaliseSensorData(int m) {
+  /*
+    Scale the sensor reading into range
+    m = measurement to be scaled
+    rmin = minimum of the range of the measurement
+    rmax = maximum of the range of the measurement
+    tmin = minimum of the range of the desired target scaling
+    tmax = maximum of the range of the desired target scaling
+    normalisedValue = ((m − rmin) / (rmax − rmin)) * (tmax − tmin) + tmin
+    https://stats.stackexchange.com/a/281164
+  */
+
+  /*
+    Sensor voltage ranges from 0.5v to 4.5v, converted to analogRead values (0 min, 1023 max) that's 102 to 921
+    rmin = 102
+    rmax = 921
+    Sensor reads from 0 to 140psi
+    tmin = 0
+    tmax = 14000
+
+    normalisedValue = ((m − 102) / (921 − 102)) * (14000 − 0) + 0
+    normalisedValue = ((m − 102) / 819) * 14000
+    normalisedValue = (m − 102) / 0.0585
+  */
+  
+  return (m - 102) / 0.0585;
+}
+
+
 void readSensorData(void) {
-    // analogRead range 0 -> 1023
-  // Sensor voltage range 0.5v -> 4.5v (analogRead 102 -> 921)
+  float absolutePressure = normaliseSensorData(analogRead(A0));
   
-  // Account for 0.5v at 0psi (analogRead of 102 == 0.5v)
-  int sensorValue = analogRead(A0) - 102;
-  
-  // 0.0585 == 819/14000; 819 == sensor range; 14000 == 140psi
-  float absolutePressure = sensorValue / 0.0585;
-  
-  // 14.7 psi == pressure at sea level
+  // Subtract 14.7 psi == pressure at sea level
   boostPressure = absolutePressure - 1470;
 
   // Oil pressure should never be negative
