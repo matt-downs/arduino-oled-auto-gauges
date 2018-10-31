@@ -67,38 +67,33 @@ void loop(void) {
 }
 
 
-float normaliseSensorData(int m) {
+float scaleValue(float val, float valMin, float valMax, float scaleMin, float scaleMax) {
   /*
     Scale the sensor reading into range
-    m = measurement to be scaled
-    rmin = minimum of the range of the measurement
-    rmax = maximum of the range of the measurement
-    tmin = minimum of the range of the desired target scaling
-    tmax = maximum of the range of the desired target scaling
-    normalisedValue = ((m − rmin) / (rmax − rmin)) * (tmax − tmin) + tmin
+    val = value to be scaled
+    valMin = minimum of the range of the value
+    valMax = maximum of the range of the value
+    scaleMin = minimum of the range of the desired target scaling
+    scaleMax = maximum of the range of the desired target scaling
+    scaledVal = ((val − valMin) / (valMax − valMin)) * (scaleMax − scaleMin) + scaleMin
     https://stats.stackexchange.com/a/281164
   */
 
-  /*
-    Sensor voltage ranges from 0.5v to 4.5v, converted to analogRead values (0 min, 1023 max) that's 102 to 921
-    rmin = 102
-    rmax = 921
-    Sensor reads from 0 to 140psi
-    tmin = 0
-    tmax = 14000
-
-    normalisedValue = ((m − 102) / (921 − 102)) * (14000 − 0) + 0
-    normalisedValue = ((m − 102) / 819) * 14000
-    normalisedValue = (m − 102) / 0.0585
-  */
-  
-  return (m - 102) / 0.0585;
+  return ((val − valMin) / (valMax − valMin)) * (scaleMax − scaleMin) + scaleMin
 }
 
 
 void readSensorData(void) {
-  float absolutePressure = normaliseSensorData(analogRead(A0));
-  
+  /*
+    Sensor voltage ranges from 0.5v to 4.5v, converted to analogRead values (0 min, 1023 max) that's 102 to 921
+    valMin = 102
+    valMax = 921
+    Sensor reads from 0 to 140psi
+    scaleMin = 0
+    scaleMax = 14000
+  */
+  float absolutePressure = scaleValue(analogRead(A0), 102, 921, 0, 14000);
+    
   // Subtract 14.7 psi == pressure at sea level
   boostPressure = absolutePressure - 1470;
 
@@ -134,22 +129,14 @@ void drawGraph(int x, int y, int len, int height) {
   // Draw the lines
   drawHorizontalDottedLine(x, y, len);
   drawHorizontalDottedLine(x, y + height, len);
-
-  //var absMin = Math.abs(boostMin);
-  int absMin = abs(boostMin);
-  int range = absMin + boostMax;
-
   // Draw 0 line
-  int zeroYPos = mapValueToYPos(absMin, range, y, height);
+  int zeroYPos = scaleValue(0, boostMax, boostMax, y, y + height)
   drawHorizontalDottedLine(x, zeroYPos, len);
 
   // Draw the graph line
   for (int i = 0; i < 128; i++) {
-    // Scale the values so that the min is always 0
-    int valueY = getSensorHistory(i) + absMin;
-
     // Calculate the coordinants
-    int yPos = mapValueToYPos(valueY, range, y, height);
+    int yPos = scaleValue(getSensorHistory(i), boostMax, boostMax, y, y + height)
     int xPos = len - i;
     if (yPos < zeroYPos) {
       // Point is above zero line, fill in space under graph
@@ -159,7 +146,6 @@ void drawGraph(int x, int y, int len, int height) {
       u8g2.drawPixel(xPos, yPos);
     }
   }
-
 }
 
 
@@ -174,16 +160,8 @@ void drawBarGraph(int x, int y, int len, int height) {
 }
 
 
-// Maps a value to a y height
-int mapValueToYPos(int val, int range, int y, int height) {
-  float valueY = ((float)val / range) * height;
-  return y + height - (int)valueY;
-}
-
-
 void drawHorizontalDottedLine(int x, int y, int len) {
   for (int i = 0; i < len; i++) {
     if (!(i % 4)) u8g2.drawPixel(x + i, y);
   }
 }
-
