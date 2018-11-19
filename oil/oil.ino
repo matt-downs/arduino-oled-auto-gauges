@@ -67,22 +67,6 @@ void loop(void) {
 }
 
 
-float scaleValue(float val, float valMin, float valMax, float scaleMin, float scaleMax) {
-  /*
-    Scale the sensor reading into range
-    val = value to be scaled
-    valMin = minimum of the range of the value
-    valMax = maximum of the range of the value
-    scaleMin = minimum of the range of the desired target scaling
-    scaleMax = maximum of the range of the desired target scaling
-    scaledVal = ((val − valMin) / (valMax − valMin)) * (scaleMax − scaleMin) + scaleMin
-    https://stats.stackexchange.com/a/281164
-  */
-
-  return ((val − valMin) / (valMax − valMin)) * (scaleMax − scaleMin) + scaleMin
-}
-
-
 void readSensorData(void) {
   /*
     Sensor voltage ranges from 0.5v to 4.5v, converted to analogRead values (0 min, 1023 max) that's 102 to 921
@@ -92,7 +76,7 @@ void readSensorData(void) {
     scaleMin = 0
     scaleMax = 14000
   */
-  float absolutePressure = scaleValue(analogRead(A0), 102, 921, 0, 14000);
+  float absolutePressure = map(analogRead(A0), 102, 921, 0, 14000);
     
   // Subtract 14.7 psi == pressure at sea level
   boostPressure = absolutePressure - 1470;
@@ -130,13 +114,13 @@ void drawGraph(int x, int y, int len, int height) {
   drawHorizontalDottedLine(x, y, len);
   drawHorizontalDottedLine(x, y + height, len);
   // Draw 0 line
-  int zeroYPos = scaleValue(0, boostMin, boostMax, y, y + height)
+  int zeroYPos = map(0, boostMin, boostMax, y, y + height)
   drawHorizontalDottedLine(x, zeroYPos, len);
 
   // Draw the graph line
   for (int i = 0; i < 128; i++) {
     // Calculate the coordinants
-    int yPos = scaleValue(getSensorHistory(i), boostMin, boostMax, y, y + height)
+    int yPos = map(getSensorHistory(i), boostMin, boostMax, y, y + height)
     int xPos = len - i;
     if (yPos < zeroYPos) {
       // Point is above zero line, fill in space under graph
