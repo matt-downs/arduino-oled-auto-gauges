@@ -2,9 +2,9 @@
 
 ## Completed project
 
-Below is an image showing the completed project installed in the dashboard of my car. Boost guage is on the left and oil pressure is on the right.
+Below is an image showing the completed project installed in the dashboard of my car. Boost pressure gauge is on the left and oil pressure is on the right.
 
-Both guages show the current value in large easily legible text at the top, and have a scrolling history graoh at the bottom. The boost guage shows the peak boost pressure for the trip at the top right.
+Both gauges show the current value in large easily legible text at the top, and have a scrolling history graoh at the bottom. The boost gauge shows the peak boost pressure for the trip at the top right.
 
 All positive values on the graph are filled in, whereas negative values are not. This gives a nice bright emphasis when boost hits a positive pressure :)
 
